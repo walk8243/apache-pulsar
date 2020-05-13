@@ -7,4 +7,6 @@ RUN curl 'https://www.apache.org/dyn/mirrors/mirrors.cgi?action=download&filenam
 
 WORKDIR /app
 COPY . .
-RUN yarn install && yarn run build
+RUN yarn install && yarn run build &&\
+	rm -rf node_modules; rm *.ts **/*.ts 2>/dev/null;\
+	yarn install --production && yarn cache clean
