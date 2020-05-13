@@ -1,0 +1,20 @@
+{
+  "name": "apache-pulsar-client",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "yarn run tsc --sourceMap false --removeComments true",
+    "build-debug": "yarn run tsc --build",
+    "clean": "yarn run tsc --build --clean",
+    "start": "node index.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "pulsar-client": "^1.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^14.0.1",
+    "@types/pulsar-client": "^1.0.0",
+    "typescript": "^3.9.2"
+  }
+}
