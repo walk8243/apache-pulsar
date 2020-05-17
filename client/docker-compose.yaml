@@ -1,0 +1,18 @@
+version: '2'
+services:
+    comsumer:
+        build: .
+        command: node comsumer.js
+        depends_on:
+            - server
+        links:
+            - server:pulsar-server
+    producer:
+        build: .
+        command: node producer.js
+        depends_on:
+            - server
+        links:
+            - server:pulsar-server
+    server:
+        image: walk8243/apache-pulsar:latest
