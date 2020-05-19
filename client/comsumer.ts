@@ -1,7 +1,10 @@
 import Consumer from './lib/Consumer';
+import Client from './lib/Pulsar';
+import fetch from 'node-fetch';
 
 (async () => {
-	const consumer = new Consumer({ host: 'pulsar-server' });
+	const client = new Client({});
+	const consumer = new Consumer({}, client);
 
 	let flag = false;
 	while(!flag) {
@@ -11,6 +14,7 @@ import Consumer from './lib/Consumer';
 
 	console.log(await consumer.getMessage());
 	await consumer.close();
+	await client.close();
 })();
 
 async function checkCluster() {

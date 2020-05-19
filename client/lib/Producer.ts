@@ -1,21 +1,23 @@
-import Pulsar, { PulsarConfig, pulsarDefaultConfig } from './Pulsar';
-import { Producer as PulsarProducer } from 'pulsar-client';
+import Pulsar from './Pulsar';
+import { Producer as PulsarProducer, ProducerOpts as PulsarProducerOpts } from 'pulsar-client';
 import * as os from 'os';
 
-export default class Producer extends Pulsar<ProducerConfig> {
+export default class Producer {
 	private producer?: PulsarProducer;
+	private client: Pulsar;
+	private config: PulsarProducerOpts & typeof producerDefaultConfig;
 
-	constructor(config: ProducerConfig) {
-		super(config, producerDefaultConfig);
+	constructor(config: ProducerConfig, client: Pulsar) {
+		this.config = { ...producerDefaultConfig, ...config };
+		this.client = client;
 	}
 
 	async connect() {
-		this.producer = await this.client.createProducer({ topic: this.config.topic });
+		this.producer = await this.client.createProducer(this.config);
 	}
 
 	async close() {
 		await this.producer?.close();
-		await super.close();
 	}
 
 	async sendMessage(message: string) {
@@ -26,13 +28,9 @@ export default class Producer extends Pulsar<ProducerConfig> {
 	}
 }
 
-export type ProducerConfig = {
-	topic?: string,
-	subscription?: string,
-} & PulsarConfig;
-
-export const producerDefaultConfig: Required<ProducerConfig> = {
-	...pulsarDefaultConfig,
+export const producerDefaultConfig = {
 	topic: 'my-topic',
 	subscription: os.hostname()
 };
+export type ProducerConfig = Omit<PulsarProducerOpts, keyof (typeof producerDefaultConfig)> & Partial<typeof producerDefaultConfig>;
+

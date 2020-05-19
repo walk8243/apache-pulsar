@@ -1,29 +1,17 @@
-import { Client } from 'pulsar-client';
+import { Client, ClientOpts } from 'pulsar-client';
 
-export default class Pulsar<C extends PulsarConfig = PulsarConfig> {
-	readonly config: Required<C>;
-	client: Client;
-
-	constructor(config: C, defaultConfig: Required<C>) {
-		this.config = { ...defaultConfig, ...config };
-		this.client = new Client({
-			serviceUrl: `pulsar${this.config.ssl ? '+ssl' : ''}://${this.config.host}:${this.config.port}`,
-		});
+export default class Pulsar extends Client {
+	constructor(config: PulsarConfig) {
+		super({ ...pulsarDefaultConfig, ...config });
 	}
 
 	async close() {
-		await this.client.close();
+		await super.close();
+		return null;
 	}
 }
 
-export type PulsarConfig = {
-	ssl?: boolean,
-	host?: string,
-	port?: number,
+export const pulsarDefaultConfig = {
+	serviceUrl: 'pulsar://localhost:6650',
 };
-
-export const pulsarDefaultConfig: Required<PulsarConfig> = {
-	ssl: false,
-	host: 'localhost',
-	port: 6650,
-};
+export type PulsarConfig = Omit<ClientOpts, keyof (typeof pulsarDefaultConfig)> & Partial<typeof pulsarDefaultConfig>;

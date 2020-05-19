@@ -1,7 +1,10 @@
 import Producer from './lib/Producer';
+import Client from './lib/Pulsar';
+import fetch from 'node-fetch';
 
 (async () => {
-	const producer = new Producer({ host: 'pulsar-server' });
+	const client = new Client({});
+	const producer = new Producer({ sendTimeoutMs: 0 }, client);
 
 	let flag = false;
 	while(!flag) {
@@ -11,6 +14,7 @@ import Producer from './lib/Producer';
 
 	producer.sendMessage('hallo world');
 	await producer.close();
+	await client.close();
 })();
 
 async function checkCluster() {

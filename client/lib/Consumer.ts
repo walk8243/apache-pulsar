@@ -1,12 +1,15 @@
-import Pulsar, { PulsarConfig, pulsarDefaultConfig } from './Pulsar';
-import { Consumer as PulsarConsumer } from 'pulsar-client';
+import Pulsar from './Pulsar';
+import { Consumer as PulsarConsumer, SubscribeOpts } from 'pulsar-client';
 import * as os from 'os';
 
-export default class Consumer extends Pulsar<ConsumerConfig> {
+export default class Consumer {
 	private subscribe?: PulsarConsumer;
+	private client: Pulsar;
+	private config: SubscribeOpts & typeof consumerDefaultConfig;
 
-	constructor(config: ConsumerConfig) {
-		super(config, consumerDefaultConfig);
+	constructor(config: ConsumerConfig, client: Pulsar) {
+		this.config = { ...consumerDefaultConfig, ...config };
+		this.client = client;
 	}
 
 	async connect() {
@@ -15,7 +18,6 @@ export default class Consumer extends Pulsar<ConsumerConfig> {
 
 	async close() {
 		await this.subscribe?.close();
-		await super.close();
 	}
 
 	async getMessage() {
@@ -28,13 +30,8 @@ export default class Consumer extends Pulsar<ConsumerConfig> {
 	}
 }
 
-export type ConsumerConfig = {
-	topic?: string,
-	subscription?: string,
-} & PulsarConfig;
-
-export const consumerDefaultConfig: Required<ConsumerConfig> = {
-	...pulsarDefaultConfig,
+export const consumerDefaultConfig = {
 	topic: 'my-topic',
 	subscription: os.hostname()
 };
+export type ConsumerConfig = Omit<SubscribeOpts, keyof (typeof consumerDefaultConfig)> & Partial<typeof consumerDefaultConfig>;
